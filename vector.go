@@ -5,16 +5,17 @@ import (
 	"math"
 )
 
-type Matrix3 [9]float64
-
+// RealEpsilon gives an upper bound on the relative error due to rounding in floating point arithmetic.
 var RealEpsilon float64
 
 func init() {
 	RealEpsilon = 0.00001
 }
 
+// Vector3 is a 3 dimensional vector
 type Vector3 [3]float64
 
+// String return a string representation of a vector with 5 decimals per axis
 func (v *Vector3) String() string {
 	return fmt.Sprintf("[%0.5f, %0.5f, %0.5f]", v[0], v[1], v[2])
 }
@@ -33,15 +34,19 @@ func NewVector3(x, y, z float64) *Vector3 {
 	return e
 }
 
-func VectorZ() *Vector3 {
+func Zero() *Vector3 {
+	return &Vector3{0, 0, 0}
+}
+
+func Z() *Vector3 {
 	return &Vector3{0, 0, 1}
 }
 
-func VectorY() *Vector3 {
+func Y() *Vector3 {
 	return &Vector3{0, 1, 0}
 }
 
-func VectorX() *Vector3 {
+func X() *Vector3 {
 	return &Vector3{1, 0, 0}
 }
 
@@ -53,16 +58,16 @@ func (v *Vector3) Clone() *Vector3 {
 	}
 }
 
-func (a *Vector3) Set(x, y, z float64) {
-	a[0] = x
-	a[1] = y
-	a[2] = z
+func (v *Vector3) Set(x, y, z float64) {
+	v[0] = x
+	v[1] = y
+	v[2] = z
 }
 
-func (a *Vector3) Copy(b *Vector3) {
-	a[0] = b[0]
-	a[1] = b[1]
-	a[2] = b[2]
+func (v *Vector3) Copy(b *Vector3) {
+	v[0] = b[0]
+	v[1] = b[1]
+	v[2] = b[2]
 }
 
 func (v *Vector3) Clear() *Vector3 {
@@ -72,198 +77,215 @@ func (v *Vector3) Clear() *Vector3 {
 	return v
 }
 
-func (a *Vector3) Add(b *Vector3) *Vector3 {
-	a[0] += b[0]
-	a[1] += b[1]
-	a[2] += b[2]
-	return a
+func (v *Vector3) Add(b *Vector3) *Vector3 {
+	v[0] += b[0]
+	v[1] += b[1]
+	v[2] += b[2]
+	return v
 }
 
-func (a *Vector3) NewAdd(b *Vector3) *Vector3 {
+func (v *Vector3) NewAdd(b *Vector3) *Vector3 {
 	return &Vector3{
-		a[0] + b[0],
-		a[1] + b[1],
-		a[2] + b[2],
+		v[0] + b[0],
+		v[1] + b[1],
+		v[2] + b[2],
 	}
 }
 
-func (a *Vector3) Sub(b *Vector3) *Vector3 {
-	a[0] -= b[0]
-	a[1] -= b[1]
-	a[2] -= b[2]
-	return a
+func (v *Vector3) Sub(b *Vector3) *Vector3 {
+	v[0] -= b[0]
+	v[1] -= b[1]
+	v[2] -= b[2]
+	return v
 }
 
-func (a *Vector3) NewSub(b *Vector3) *Vector3 {
+func (v *Vector3) NewSub(b *Vector3) *Vector3 {
 	return &Vector3{
-		a[0] - b[0],
-		a[1] - b[1],
-		a[2] - b[2],
+		v[0] - b[0],
+		v[1] - b[1],
+		v[2] - b[2],
 	}
 }
 
-func (a *Vector3) AddScaledVector(b *Vector3, t float64) *Vector3 {
+func (v *Vector3) AddScaledVector(b *Vector3, t float64) *Vector3 {
 	if math.IsNaN(t) {
 		panic("scale value passed to Vector3.AddScaledVector() is NaN")
 	}
-	a[0] += b[0] * t
-	a[1] += b[1] * t
-	a[2] += b[2] * t
-	return a
+	v[0] += b[0] * t
+	v[1] += b[1] * t
+	v[2] += b[2] * t
+	return v
 }
 
-func (a *Vector3) Inverse() *Vector3 {
-	a[0] = -a[0]
-	a[1] = -a[1]
-	a[2] = -a[2]
-	return a
+func (v *Vector3) Inverse() *Vector3 {
+	v[0] = -v[0]
+	v[1] = -v[1]
+	v[2] = -v[2]
+	return v
 }
 
-func (a *Vector3) NewInverse() *Vector3 {
+func (v *Vector3) NewInverse() *Vector3 {
 	return &Vector3{
-		-a[0],
-		-a[1],
-		-a[2],
+		-v[0],
+		-v[1],
+		-v[2],
 	}
 }
 
-func (a *Vector3) Length() float64 {
-	return math.Sqrt(a[0]*a[0] + a[1]*a[1] + a[2]*a[2])
+func (v *Vector3) Length() float64 {
+	return math.Sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
 }
 
-func (a *Vector3) SquareLength() float64 {
-	return a[0]*a[0] + a[1]*a[1] + a[2]*a[2]
+func (v *Vector3) SquareLength() float64 {
+	return v[0]*v[0] + v[1]*v[1] + v[2]*v[2]
 }
 
-func (a *Vector3) Normalize() *Vector3 {
-	length := a.Length()
+func (v *Vector3) Normalize() *Vector3 {
+	length := v.Length()
 	if length > 0 {
-		a.Scale(1 / length)
+		v.Scale(1 / length)
 	}
-	return a
+	return v
 }
 
-func (a *Vector3) Scale(alpha float64) *Vector3 {
-	a[0] *= alpha
-	a[1] *= alpha
-	a[2] *= alpha
-	return a
+func (v *Vector3) Scale(t float64) *Vector3 {
+	v[0] *= t
+	v[1] *= t
+	v[2] *= t
+	return v
 }
 
-func (a *Vector3) NewScale(alpha float64) *Vector3 {
+func (v *Vector3) NewScale(t float64) *Vector3 {
 	return &Vector3{
-		a[0] * alpha,
-		a[1] * alpha,
-		a[2] * alpha,
+		v[0] * t,
+		v[1] * t,
+		v[2] * t,
 	}
 }
 
-func (a *Vector3) Dot(b *Vector3) float64 {
-	return a[0]*b[0] + a[1]*b[1] + a[2]*b[2]
+func (v *Vector3) Dot(b *Vector3) float64 {
+	return v[0]*b[0] + v[1]*b[1] + v[2]*b[2]
 }
 
-func (a *Vector3) NewCross(vector *Vector3) *Vector3 {
+// NewCross aka VectorProduct
+func (v *Vector3) NewCross(b *Vector3) *Vector3 {
 	return &Vector3{
-		a[1]*vector[2] - a[2]*vector[1],
-		a[2]*vector[0] - a[0]*vector[2],
-		a[0]*vector[1] - a[1]*vector[0],
+		v[1]*b[2] - v[2]*b[1],
+		v[2]*b[0] - v[0]*b[2],
+		v[0]*b[1] - v[1]*b[0],
 	}
 
 }
 
-// VectorProduct aka cross product
-func (a *Vector3) NewVectorProduct(vector *Vector3) *Vector3 {
-	return a.NewCross(vector)
+// NewVectorProduct aka cross product
+func (v *Vector3) NewVectorProduct(b *Vector3) *Vector3 {
+	return v.NewCross(b)
 }
 
 // ScalarProduct calculates and returns the scalar product of this vector
 // with the given vector.
-func (a *Vector3) ScalarProduct(vector *Vector3) float64 {
-	return a[0]*vector[0] + a[1]*vector[1] + a[2]*vector[2]
+func (v *Vector3) ScalarProduct(b *Vector3) float64 {
+	return v[0]*b[0] + v[1]*b[1] + v[2]*b[2]
 }
 
-func (a *Vector3) HadamardProduct(vector *Vector3) *Vector3 {
-	a[0] *= vector[0]
-	a[1] *= vector[1]
-	a[2] *= vector[2]
-	return a
+func (v *Vector3) HadamardProduct(b *Vector3) *Vector3 {
+	v[0] *= b[0]
+	v[1] *= b[1]
+	v[2] *= b[2]
+	return v
 }
 
-func (a *Vector3) NewHadamardProduct(vector *Vector3) *Vector3 {
+func (v *Vector3) NewHadamardProduct(b *Vector3) *Vector3 {
 	return &Vector3{
-		a[0] * vector[0],
-		a[1] * vector[1],
-		a[2] * vector[2],
+		v[0] * b[0],
+		v[1] * b[1],
+		v[2] * b[2],
 	}
 }
 
-func (a *Vector3) Equals(z *Vector3) bool {
-	diff := math.Abs(a[0] - z[0])
+func (v *Vector3) Equals(b *Vector3) bool {
+	diff := math.Abs(v[0] - b[0])
 	if diff > RealEpsilon {
 		return false
 	}
-	diff = math.Abs(a[1] - z[1])
+	diff = math.Abs(v[1] - b[1])
 	if diff > RealEpsilon {
 		return false
 	}
-	diff = math.Abs(a[2] - z[2])
-	if diff > RealEpsilon {
-		return false
-	}
-	return true
+
+	diff = math.Abs(v[2] - b[2])
+	return diff < RealEpsilon
 }
 
 // http://pastebin.com/fAFp6NnN
-func (value *Vector3) Rotate(rotation *Quaternion) *Vector3 {
-	num12 := rotation.I + rotation.I
-	num2 := rotation.J + rotation.J
-	num := rotation.K + rotation.K
-	num11 := rotation.R * num12
-	num10 := rotation.R * num2
-	num9 := rotation.R * num
-	num8 := rotation.I * num12
-	num7 := rotation.I * num2
-	num6 := rotation.I * num
-	num5 := rotation.J * num2
-	num4 := rotation.J * num
-	num3 := rotation.K * num
-	num15 := ((value[0] * ((1.0 - num5) - num3)) + (value[1] * (num7 - num9))) + (value[2] * (num6 + num10))
-	num14 := ((value[0] * (num7 + num9)) + (value[1] * ((1.0 - num8) - num3))) + (value[2] * (num4 - num11))
-	num13 := ((value[0] * (num6 - num10)) + (value[1] * (num4 + num11))) + (value[2] * ((1.0 - num8) - num5))
+func (v *Vector3) Rotate(q *Quaternion) *Vector3 {
+	num12 := q.I + q.I
+	num2 := q.J + q.J
+	num := q.K + q.K
+	num11 := q.R * num12
+	num10 := q.R * num2
+	num9 := q.R * num
+	num8 := q.I * num12
+	num7 := q.I * num2
+	num6 := q.I * num
+	num5 := q.J * num2
+	num4 := q.J * num
+	num3 := q.K * num
+	num15 := ((v[0] * ((1.0 - num5) - num3)) + (v[1] * (num7 - num9))) + (v[2] * (num6 + num10))
+	num14 := ((v[0] * (num7 + num9)) + (v[1] * ((1.0 - num8) - num3))) + (v[2] * (num4 - num11))
+	num13 := ((v[0] * (num6 - num10)) + (v[1] * (num4 + num11))) + (v[2] * ((1.0 - num8) - num5))
 
-	value[0] = num15
-	value[1] = num14
-	value[2] = num13
-	return value
+	v[0] = num15
+	v[1] = num14
+	v[2] = num13
+	return v
 }
 
-func (a *Vector3) NewRotate(q *Quaternion) *Vector3 {
-	return a.Clone().Rotate(q)
+func (v *Vector3) NewRotate(q *Quaternion) *Vector3 {
+	return v.Clone().Rotate(q)
 }
 
-func (data *Matrix3) TransformVector3(vector *Vector3) *Vector3 {
+// Matrix3 is a 3x3 dimensional matrix
+type Matrix3 [9]float64
+
+// SetFromComponents sets the matrix from the given three vectors components. These are arranged as
+// the three columns of the matrix
+func (m *Matrix3) SetFromComponents(a, b, c *Vector3) {
+	m[0] = a[0]
+	m[1] = b[0]
+	m[2] = c[0]
+	m[3] = a[1]
+	m[4] = b[1]
+	m[5] = c[1]
+	m[6] = a[2]
+	m[7] = b[2]
+	m[8] = c[2]
+}
+
+func (m *Matrix3) TransformVector3(v *Vector3) *Vector3 {
 	return &Vector3{
-		vector[0]*data[0] + vector[1]*data[1] + vector[2]*data[2],
-		vector[0]*data[3] + vector[1]*data[4] + vector[2]*data[5],
-		vector[0]*data[6] + vector[1]*data[7] + vector[2]*data[8],
+		v[0]*m[0] + v[1]*m[1] + v[2]*m[2],
+		v[0]*m[3] + v[1]*m[4] + v[2]*m[5],
+		v[0]*m[6] + v[1]*m[7] + v[2]*m[8],
 	}
 }
 
-func (m *Matrix3) TransformMatrix3(o *Matrix3) *Matrix3 {
+func (m *Matrix3) TransformMatrix3(b *Matrix3) *Matrix3 {
 	newMatrix := &Matrix3{}
-	newMatrix[0] = m[0]*o[0] + m[1]*o[3] + m[2] + o[6]
-	newMatrix[1] = m[0]*o[1] + m[1]*o[4] + m[2] + o[7]
-	newMatrix[2] = m[0]*o[2] + m[1]*o[5] + m[2] + o[8]
-	newMatrix[3] = m[3]*o[0] + m[4]*o[3] + m[5] + o[6]
-	newMatrix[4] = m[3]*o[1] + m[4]*o[5] + m[5] + o[7]
-	newMatrix[5] = m[3]*o[2] + m[4]*o[6] + m[5] + o[8]
-	newMatrix[6] = m[6]*o[0] + m[7]*o[3] + m[8] + o[6]
-	newMatrix[7] = m[6]*o[1] + m[7]*o[4] + m[8] + o[7]
-	newMatrix[8] = m[6]*o[2] + m[7]*o[5] + m[8] + o[8]
+	newMatrix[0] = m[0]*b[0] + m[1]*b[3] + m[2] + b[6]
+	newMatrix[1] = m[0]*b[1] + m[1]*b[4] + m[2] + b[7]
+	newMatrix[2] = m[0]*b[2] + m[1]*b[5] + m[2] + b[8]
+	newMatrix[3] = m[3]*b[0] + m[4]*b[3] + m[5] + b[6]
+	newMatrix[4] = m[3]*b[1] + m[4]*b[5] + m[5] + b[7]
+	newMatrix[5] = m[3]*b[2] + m[4]*b[6] + m[5] + b[8]
+	newMatrix[6] = m[6]*b[0] + m[7]*b[3] + m[8] + b[6]
+	newMatrix[7] = m[6]*b[1] + m[7]*b[4] + m[8] + b[7]
+	newMatrix[8] = m[6]*b[2] + m[7]*b[5] + m[8] + b[8]
 	return newMatrix
 }
 
-func (a *Matrix3) SetInverse(b *Matrix3) {
+// Returns a new matrix containing the inverse of this matrix
+func (m *Matrix3) SetInverse(b *Matrix3) {
 
 	t1 := b[0] * b[4]
 	t2 := b[0] * b[5]
@@ -280,22 +302,24 @@ func (a *Matrix3) SetInverse(b *Matrix3) {
 	}
 	invd := 1 / det
 
-	a[0] = (b[4]*b[8] - b[5]*b[7]) * invd
-	a[1] = -(b[1]*b[8] - b[2]*b[7]) * invd
-	a[2] = (b[1]*b[5] - b[2]*b[4]) * invd
+	m[0] = (b[4]*b[8] - b[5]*b[7]) * invd
+	m[1] = -(b[1]*b[8] - b[2]*b[7]) * invd
+	m[2] = (b[1]*b[5] - b[2]*b[4]) * invd
 
-	a[3] = -(b[3]*b[8] - b[5]*b[6]) * invd
-	a[4] = (b[0]*b[8] - t6) * invd
-	a[5] = -(t2 - t4) * invd
+	m[3] = -(b[3]*b[8] - b[5]*b[6]) * invd
+	m[4] = (b[0]*b[8] - t6) * invd
+	m[5] = -(t2 - t4) * invd
 
-	a[6] = (b[3]*b[7] - b[4]*b[6]) * invd
-	a[7] = -(b[0]*b[7] - t5) * invd
-	a[8] = (t1 - t3) * invd
+	m[6] = (b[3]*b[7] - b[4]*b[6]) * invd
+	m[7] = -(b[0]*b[7] - t5) * invd
+	m[8] = (t1 - t3) * invd
 
 }
 
-// Returns a new matrix containing the inverse of this matrix
-func (m *Matrix3) Inverse() *Matrix3 {
+// Returns a new matrix containing the inverse of this matrix, If a matrix represents a rotation the
+// inverse is it's transpose. This very handy when we want to transforming coordinates from
+// world -> local space and inverse of the matrix would do local -> world space.
+func (m *Matrix3) NewInverse() *Matrix3 {
 	result := &Matrix3{}
 	result.SetInverse(m)
 	return result
@@ -338,38 +362,34 @@ func (m *Matrix3) SetBlockInertiaTensor(halfSizes *Vector3, mass float64) {
 	)
 }
 
-func (orig *Matrix3) SetTranspose(m *Matrix3) {
-	orig[0] = m[0]
-	orig[1] = m[3]
-	orig[2] = m[6]
-	orig[3] = m[1]
-	orig[4] = m[4]
-	orig[5] = m[7]
-	orig[6] = m[2]
-	orig[7] = m[5]
-	orig[8] = m[8]
+func (m *Matrix3) SetTranspose(b *Matrix3) {
+	m[0] = b[0]
+	m[1] = b[3]
+	m[2] = b[6]
+	m[3] = b[1]
+	m[4] = b[4]
+	m[5] = b[7]
+	m[6] = b[2]
+	m[7] = b[5]
+	m[8] = b[8]
 }
 
-func (orig *Matrix3) Transpose(m *Matrix3) *Matrix3 {
+func (m *Matrix3) Transpose() *Matrix3 {
 	result := &Matrix3{}
-	result.SetTranspose(orig)
+	result.SetTranspose(m)
 	return result
 }
 
-func (data *Matrix3) SetOrientation(q *Quaternion) {
-	data[0] = 1 - (2*q.J*q.J + 2*q.K*q.K)
-	data[1] = 2*q.I*q.J + 2*q.K*q.R
-	data[2] = 2*q.I*q.K - 2*q.J*q.R
-	data[3] = 2*q.I*q.J - 2*q.K*q.R
-	data[4] = 1 - (2*q.I*q.I + 2*q.K*q.K)
-	data[5] = 2*q.J*q.K + 2*q.I*q.R
-	data[6] = 2*q.I*q.K + 2*q.J*q.R
-	data[7] = 2*q.J*q.K - 2*q.I*q.R
-	data[8] = 1 - (2*q.I*q.I + 2*q.J*q.J)
-}
-
-func (data *Matrix3) SetOrientationAndPos(q *Quaternion, pos *Vector3) {
-
+func (m *Matrix3) SetOrientation(q *Quaternion) {
+	m[0] = 1 - (2*q.J*q.J + 2*q.K*q.K)
+	m[1] = 2*q.I*q.J + 2*q.K*q.R
+	m[2] = 2*q.I*q.K - 2*q.J*q.R
+	m[3] = 2*q.I*q.J - 2*q.K*q.R
+	m[4] = 1 - (2*q.I*q.I + 2*q.K*q.K)
+	m[5] = 2*q.J*q.K + 2*q.I*q.R
+	m[6] = 2*q.I*q.K + 2*q.J*q.R
+	m[7] = 2*q.J*q.K - 2*q.I*q.R
+	m[8] = 1 - (2*q.I*q.I + 2*q.J*q.J)
 }
 
 func (m *Matrix3) LinearInterpolate(a, b *Matrix3, prop float64) *Matrix3 {
@@ -382,32 +402,32 @@ func (m *Matrix3) LinearInterpolate(a, b *Matrix3, prop float64) *Matrix3 {
 
 type Matrix4 [12]float64
 
-func (m *Matrix4) TransformVector3(v *Vector3) *Vector3 {
+func (m *Matrix4) TransformVector3(b *Vector3) *Vector3 {
 	return &Vector3{
-		v[0]*m[0] + v[1]*m[1] + v[2]*m[2] + m[3],
-		v[0]*m[4] + v[1]*m[5] + v[2]*m[6] + m[7],
-		v[0]*m[8] + v[1]*m[9] + v[2]*m[10] + m[11],
+		b[0]*m[0] + b[1]*m[1] + b[2]*m[2] + m[3],
+		b[0]*m[4] + b[1]*m[5] + b[2]*m[6] + m[7],
+		b[0]*m[8] + b[1]*m[9] + b[2]*m[10] + m[11],
 	}
 }
 
-func (m *Matrix4) TransformMatrix4(o *Matrix4) *Matrix4 {
+func (m *Matrix4) TransformMatrix4(b *Matrix4) *Matrix4 {
 	newMatrix := &Matrix4{}
 
-	newMatrix[0] = o[0]*m[0] + o[4]*m[1] + o[8]*m[2]
-	newMatrix[4] = o[0]*m[4] + o[4]*m[5] + o[8]*m[6]
-	newMatrix[8] = o[0]*m[8] + o[4]*m[9] + o[8]*m[10]
+	newMatrix[0] = b[0]*m[0] + b[4]*m[1] + b[8]*m[2]
+	newMatrix[4] = b[0]*m[4] + b[4]*m[5] + b[8]*m[6]
+	newMatrix[8] = b[0]*m[8] + b[4]*m[9] + b[8]*m[10]
 
-	newMatrix[1] = o[1]*m[0] + o[5]*m[1] + o[9]*m[2]
-	newMatrix[5] = o[1]*m[4] + o[5]*m[5] + o[9]*m[6]
-	newMatrix[9] = o[1]*m[8] + o[5]*m[9] + o[9]*m[10]
+	newMatrix[1] = b[1]*m[0] + b[5]*m[1] + b[9]*m[2]
+	newMatrix[5] = b[1]*m[4] + b[5]*m[5] + b[9]*m[6]
+	newMatrix[9] = b[1]*m[8] + b[5]*m[9] + b[9]*m[10]
 
-	newMatrix[2] = o[2]*m[0] + o[6]*m[1] + o[10]*m[2]
-	newMatrix[6] = o[2]*m[4] + o[6]*m[5] + o[10]*m[6]
-	newMatrix[10] = o[2]*m[8] + o[6]*m[9] + o[10]*m[10]
+	newMatrix[2] = b[2]*m[0] + b[6]*m[1] + b[10]*m[2]
+	newMatrix[6] = b[2]*m[4] + b[6]*m[5] + b[10]*m[6]
+	newMatrix[10] = b[2]*m[8] + b[6]*m[9] + b[10]*m[10]
 
-	newMatrix[3] = o[3]*m[0] + o[7]*m[1] + o[11]*m[2] + m[3]
-	newMatrix[7] = o[3]*m[4] + o[7]*m[5] + o[11]*m[6] + m[7]
-	newMatrix[11] = o[3]*m[8] + o[7]*m[9] + o[11]*m[10] + m[11]
+	newMatrix[3] = b[3]*m[0] + b[7]*m[1] + b[11]*m[2] + m[3]
+	newMatrix[7] = b[3]*m[4] + b[7]*m[5] + b[11]*m[6] + m[7]
+	newMatrix[11] = b[3]*m[8] + b[7]*m[9] + b[11]*m[10] + m[11]
 
 	return newMatrix
 }
@@ -417,29 +437,29 @@ func (m *Matrix4) getDeterminant() float64 {
 }
 
 // https://github.com/stojg/cyclone-physics/blob/master/src/core.cpp#L55
-func (data *Matrix4) SetInverse(m *Matrix4) {
-	det := data.getDeterminant()
+func (m *Matrix4) SetInverse(b *Matrix4) {
+	det := m.getDeterminant()
 	if det == 0 {
 		return
 	}
 
 	det = 1.0 / det
 
-	data[0] = (-m[9]*m[6] + m[5]*m[10]) * det
-	data[4] = (m[8]*m[6] - m[4]*m[10]) * det
-	data[8] = (-m[8]*m[5] + m[4]*m[9]) * det
+	m[0] = (-b[9]*b[6] + b[5]*b[10]) * det
+	m[4] = (b[8]*b[6] - b[4]*b[10]) * det
+	m[8] = (-b[8]*b[5] + b[4]*b[9]) * det
 
-	data[1] = (m[9]*m[2] - m[1]*m[10]) * det
-	data[5] = (-m[8]*m[2] + m[0]*m[10]) * det
-	data[9] = (m[8]*m[1] - m[0]*m[9]) * det
+	m[1] = (b[9]*b[2] - b[1]*b[10]) * det
+	m[5] = (-b[8]*b[2] + b[0]*b[10]) * det
+	m[9] = (b[8]*b[1] - b[0]*b[9]) * det
 
-	data[2] = (-m[5]*m[2] + m[1]*m[6]) * det
-	data[6] = (+m[4]*m[2] - m[0]*m[6]) * det
-	data[10] = (-m[4]*m[1] + m[0]*m[5]) * det
+	m[2] = (-b[5]*b[2] + b[1]*b[6]) * det
+	m[6] = (+b[4]*b[2] - b[0]*b[6]) * det
+	m[10] = (-b[4]*b[1] + b[0]*b[5]) * det
 
-	data[3] = (+m[9]*m[6]*m[3] - m[5]*m[10]*m[3] - m[9]*m[2]*m[7] + m[1]*m[10]*m[7] + m[5]*m[2]*m[11] - m[1]*m[6]*m[11]) * det
-	data[7] = (-m[8]*m[6]*m[3] + m[4]*m[10]*m[3] + m[8]*m[2]*m[7] - m[0]*m[10]*m[7] - m[4]*m[2]*m[11] + m[0]*m[6]*m[11]) * det
-	data[11] = (+m[8]*m[6]*m[3] - m[4]*m[9]*m[3] - m[8]*m[1]*m[7] + m[0]*m[9]*m[7] + m[4]*m[1]*m[11] - m[0]*m[5]*m[11]) * det
+	m[3] = (+b[9]*b[6]*b[3] - b[5]*b[10]*b[3] - b[9]*b[2]*b[7] + b[1]*b[10]*b[7] + b[5]*b[2]*b[11] - b[1]*b[6]*b[11]) * det
+	m[7] = (-b[8]*b[6]*b[3] + b[4]*b[10]*b[3] + b[8]*b[2]*b[7] - b[0]*b[10]*b[7] - b[4]*b[2]*b[11] + b[0]*b[6]*b[11]) * det
+	m[11] = (+b[8]*b[6]*b[3] - b[4]*b[9]*b[3] - b[8]*b[1]*b[7] + b[0]*b[9]*b[7] + b[4]*b[1]*b[11] - b[0]*b[5]*b[11]) * det
 }
 
 func (m *Matrix4) Inverse() *Matrix4 {
@@ -448,21 +468,21 @@ func (m *Matrix4) Inverse() *Matrix4 {
 	return result
 }
 
-func (data *Matrix4) SetOrientation(q *Quaternion, pos *Vector3) {
-	data[0] = 1 - (2*q.J*q.J + 2*q.K*q.K)
-	data[1] = 2*q.I*q.J + 2*q.K*q.R
-	data[2] = 2*q.I*q.K - 2*q.J*q.R
-	data[3] = pos[0]
+func (m *Matrix4) SetOrientation(q *Quaternion, b *Vector3) {
+	m[0] = 1 - (2*q.J*q.J + 2*q.K*q.K)
+	m[1] = 2*q.I*q.J + 2*q.K*q.R
+	m[2] = 2*q.I*q.K - 2*q.J*q.R
+	m[3] = b[0]
 
-	data[4] = 2*q.I*q.J - 2*q.K*q.R
-	data[5] = 1 - (2*q.I*q.I + 2*q.K*q.K)
-	data[6] = 2*q.J*q.K + 2*q.I*q.R
-	data[7] = pos[1]
+	m[4] = 2*q.I*q.J - 2*q.K*q.R
+	m[5] = 1 - (2*q.I*q.I + 2*q.K*q.K)
+	m[6] = 2*q.J*q.K + 2*q.I*q.R
+	m[7] = b[1]
 
-	data[8] = 2*q.I*q.K + 2*q.J*q.R
-	data[9] = 2*q.J*q.K - 2*q.I*q.R
-	data[10] = 1 - (2*q.I*q.I + 2*q.J*q.J)
-	data[11] = pos[2]
+	m[8] = 2*q.I*q.K + 2*q.J*q.R
+	m[9] = 2*q.J*q.K - 2*q.I*q.R
+	m[10] = 1 - (2*q.I*q.I + 2*q.J*q.J)
+	m[11] = b[2]
 }
 
 /**
@@ -478,32 +498,32 @@ func (data *Matrix4) SetOrientation(q *Quaternion, pos *Vector3) {
  *
  * @param vector The vector to transform.
  */
-func (data *Matrix4) TransformInverse(vector *Vector3) *Vector3 {
+func (m *Matrix4) TransformInverse(b *Vector3) *Vector3 {
 	tmp := &Vector3{}
-	tmp[0] -= data[3]
-	tmp[1] -= data[7]
-	tmp[2] -= data[11]
+	tmp[0] -= m[3]
+	tmp[1] -= m[7]
+	tmp[2] -= m[11]
 
 	result := &Vector3{}
-	result[0] = tmp[0]*data[0] + tmp[1]*data[4] + tmp[2]*data[8]
-	result[1] = tmp[0]*data[1] + tmp[1]*data[5] + tmp[2]*data[9]
-	result[2] = tmp[0]*data[2] + tmp[1]*data[6] + tmp[2]*data[10]
+	result[0] = tmp[0]*m[0] + tmp[1]*m[4] + tmp[2]*m[8]
+	result[1] = tmp[0]*m[1] + tmp[1]*m[5] + tmp[2]*m[9]
+	result[2] = tmp[0]*m[2] + tmp[1]*m[6] + tmp[2]*m[10]
 	return result
 }
 
-func (data *Matrix4) TransformDirection(vector *Vector3) *Vector3 {
+func (m *Matrix4) TransformDirection(b *Vector3) *Vector3 {
 	result := &Vector3{}
-	result[0] = vector[0]*data[0] + vector[1]*data[1] + vector[2]*data[2]
-	result[1] = vector[0]*data[4] + vector[1]*data[5] + vector[2]*data[6]
-	result[2] = vector[0]*data[8] + vector[1]*data[9] + vector[2]*data[10]
+	result[0] = b[0]*m[0] + b[1]*m[1] + b[2]*m[2]
+	result[1] = b[0]*m[4] + b[1]*m[5] + b[2]*m[6]
+	result[2] = b[0]*m[8] + b[1]*m[9] + b[2]*m[10]
 	return result
 }
 
-func (data *Matrix4) TransformInverseDirection(vector *Vector3) *Vector3 {
+func (m *Matrix4) TransformInverseDirection(b *Vector3) *Vector3 {
 	result := &Vector3{}
-	result[0] = vector[0]*data[0] + vector[1]*data[4] + vector[2]*data[8]
-	result[1] = vector[0]*data[1] + vector[1]*data[5] + vector[2]*data[9]
-	result[2] = vector[0]*data[2] + vector[1]*data[6] + vector[2]*data[10]
+	result[0] = b[0]*m[0] + b[1]*m[4] + b[2]*m[8]
+	result[1] = b[0]*m[1] + b[1]*m[5] + b[2]*m[9]
+	result[2] = b[0]*m[2] + b[1]*m[6] + b[2]*m[10]
 	return result
 }
 
@@ -522,13 +542,13 @@ func NewQuaternion(r, i, j, k float64) *Quaternion {
 func QuaternionToTarget(origin, target *Vector3) *Quaternion {
 	dest := target.NewSub(origin).Normalize()
 
-	source := VectorZ()
+	source := Z()
 	dot := source.Dot(dest)
 	if math.Abs(dot-(-1.0)) < RealEpsilon {
 		// vector a and b point exactly in the opposite direction,
 		// so it is a 180 degrees turn around the up-axis
 		//return new Quaternion(up, MathHelper.ToRadians(180.0f));
-		return QuaternionFromAxisAngle(VectorY(), -math.Pi)
+		return QuaternionFromAxisAngle(Y(), -math.Pi)
 	} else if math.Abs(dot-(1.0)) < RealEpsilon {
 		// vector a and b point exactly in the same direction
 		// so we return the identity quaternion
@@ -613,7 +633,8 @@ func (q *Quaternion) Normalize() {
 	q.K *= d
 }
 
-// http://www.ncsa.illinois.edu/People/kindr/emtc/quaternions/quaternion.c++
+// Conjugate transforms the quaternion by negating it's vector components:
+// http://www.3dgep.com/understanding-quaternions/#Quaternion_Conjugate
 func (q *Quaternion) Conjugate() *Quaternion {
 	q.I = -q.I
 	q.J = -q.J
@@ -621,6 +642,7 @@ func (q *Quaternion) Conjugate() *Quaternion {
 	return q
 }
 
+// Conjugate returns a new conjugate version of this quaternion
 func (q *Quaternion) NewConjugate() *Quaternion {
 	return q.Clone().Conjugate()
 }
@@ -656,7 +678,7 @@ func (q *Quaternion) Norm() float64 {
 	return q.SquareLength()
 }
 
-// Multiplies the quaternion by the given quaternion.
+// Multiply multiplies the receiver quaternion by the given quaternion.
 func (q *Quaternion) Multiply(o *Quaternion) *Quaternion {
 	*q = Quaternion{
 		-q.I*o.I - q.J*o.J - q.K*o.K + q.R*o.R,
@@ -667,13 +689,14 @@ func (q *Quaternion) Multiply(o *Quaternion) *Quaternion {
 	return q
 }
 
-// Multiplies the quaternion by the given quaternion.
+// NewMultiply returns a new quaternion from the result of multiplying the receiver by the given
+// quaternion.
 func (q *Quaternion) NewMultiply(o *Quaternion) *Quaternion {
 	return q.Clone().Multiply(o)
 }
 
-// Adds the given vector to this, scaled by the given amount. This is
-// used to update the orientation quaternion by a rotation and time.
+// AddScaledVector adds the given vector to this, scaled by the given amount. This can be use to
+// update the orientation quaternion by a rotation and time.
 func (q *Quaternion) AddScaledVector(vector *Vector3, scale float64) {
 
 	vectorQ := &Quaternion{0, vector[0] * scale, vector[1] * scale, vector[2] * scale}
@@ -692,10 +715,6 @@ func (q *Quaternion) RotateByVector(vector *Vector3) *Quaternion {
 
 func (q *Quaternion) NewRotateByVector(vector *Vector3) *Quaternion {
 	return q.NewMultiply(&Quaternion{0, vector[0], vector[1], vector[2]})
-}
-
-func (q *Quaternion) AsMatrix() *Matrix4 {
-	return &Matrix4{}
 }
 
 func LocalToWorld(local *Vector3, transform *Matrix4) *Vector3 {
