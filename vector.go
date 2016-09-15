@@ -167,7 +167,7 @@ func (v *Vector3) Dot(b *Vector3) float64 {
 	return v[0]*b[0] + v[1]*b[1] + v[2]*b[2]
 }
 
-// NewCross aka VectorProduct
+// NewCross aka VectorProduct "%"
 func (v *Vector3) NewCross(b *Vector3) *Vector3 {
 	return &Vector3{
 		v[1]*b[2] - v[2]*b[1],
@@ -261,11 +261,23 @@ func (m *Matrix3) SetFromComponents(a, b, c *Vector3) {
 	m[8] = c[2]
 }
 
-func (m *Matrix3) TransformVector3(v *Vector3) *Vector3 {
+func (m *Matrix3) Transform(v *Vector3) *Vector3 {
 	return &Vector3{
 		v[0]*m[0] + v[1]*m[1] + v[2]*m[2],
 		v[0]*m[3] + v[1]*m[4] + v[2]*m[5],
 		v[0]*m[6] + v[1]*m[7] + v[2]*m[8],
+	}
+}
+
+// TransformTranspose is a convenience method that combines the effect of transforming a vector by
+// the transpose of a matrix.
+// It works by performing a regular matrix transformation, but selecting the components of matrix in
+// row rather than column order.
+func (m *Matrix3) TransformTranspose(v *Vector3) *Vector3 {
+	return &Vector3{
+		v[0]*m[0] + v[1]*m[3] + v[2]*m[6],
+		v[0]*m[1] + v[1]*m[4] + v[2]*m[7],
+		v[0]*m[2] + v[1]*m[5] + v[2]*m[8],
 	}
 }
 
