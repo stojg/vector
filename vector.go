@@ -212,7 +212,6 @@ func (v *Vector3) Equals(b *Vector3) bool {
 	if diff > RealEpsilon {
 		return false
 	}
-
 	diff = math.Abs(v[2] - b[2])
 	return diff < RealEpsilon
 }
