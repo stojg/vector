@@ -413,6 +413,26 @@ func (m *Matrix3) LinearInterpolate(a, b *Matrix3, prop float64) *Matrix3 {
 
 type Matrix4 [12]float64
 
+func (m *Matrix4) Clone() *Matrix4 {
+	n := &Matrix4{}
+	for i := range m {
+		n[i] = m[i]
+	}
+	return n
+}
+
+func (m *Matrix4) Equals(other *Matrix4) bool {
+	if other == nil {
+		return false
+	}
+	for i := range m {
+		if math.Abs(m[i]-other[i]) > RealEpsilon {
+			return false
+		}
+	}
+	return true
+}
+
 func (m *Matrix4) TransformVector3(b *Vector3) *Vector3 {
 	return &Vector3{
 		b[0]*m[0] + b[1]*m[1] + b[2]*m[2] + m[3],
